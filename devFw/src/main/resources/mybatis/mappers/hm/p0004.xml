@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace = "hm.p0004">
+	<resultMap id="p0004Result01" type="p0004VO">
+		<result property="cust_id" column="label"/>
+		<result property="before_cust_id" column="before_cust_id" />
+		<result property="after_cust_id" column="after_cust_id" />
+		<result property="cust_name" column="parentNO"/>
+		<result property="cust_address" column="label"/>
+		<result property="cust_state" column="label"/>
+		<result property="cust_zip" column="label"/>
+		<result property="cust_country" column="label"/>
+		<result property="cust_contact" column="label"/>
+		<result property="cust_email" column="label"/>
+	</resultMap>
+	
+	<select id="searchMember" resultMap="p0004Result01" parameterType="java.util.Map">
+	 <![CDATA[
+	 	SELECT *
+	 	FROM (
+	 		SELECT a.*
+	 			, LAG(cust_id, 1, 0) OVER (ORDER BY cust_id desc) as before_cust_id
+	 			, LEAD(cust_id, 1, 0) OVER (ORDER BY cust_id desc) as after_cust_id
+	 		FROM customers a
+	 	)
+	 ]]>
+	  <where>
+	  	<if test=" p_cust_id != '' and p_cust_id != null">
+	  		cust_id = #{p_cust_id}
+	  	</if>
+	  	ORDER BY cust_id desc
+	  </where>
+	</select>
+	
+	<update id="updateMember" parameterType="java.util.Map">
+		update customers
+		set cust_name = #{cust_name}
+			, cust_address = #{cust_address}
+			, cust_state = #{cust_state}
+			, cust_zip = #{cust_zip}
+			, cust_country = #{cust_country}
+			, cust_contact = #{cust_contact}
+			, cust_email = #{cust_email}
+		where cust_id = #{cust_id}
+	</update>
+</mapper>
